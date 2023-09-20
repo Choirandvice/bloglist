@@ -268,3 +268,88 @@ describe('favorite blog', () => {
     expect(listHelper.favoriteBlog([])).toEqual([])
   })
 })
+
+describe('most blogged author', () => {
+
+  const listWithOneBlog = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 5,
+      __v: 0
+    }
+  ]
+
+  test('of a single blog', () => {
+
+    const expected = {
+      author:'Edsger W. Dijkstra',
+      blogs:1
+    }
+
+    expect((listHelper.mostBlogsAuthor(listWithOneBlog))).toEqual(expected)
+  })
+
+  const blogsWithTwoAuthors = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful1',
+      author: 'Steve',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 5,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f7',
+      title: 'Go To Statement Considered Harmful2',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 10,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f6',
+      title: 'Go To Statement Considered Harmful3',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 7,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f5',
+      title: 'Go To Statement Considered Harmful4',
+      author: 'Bob',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 10,
+      __v: 0
+    },
+    {
+      _id: '5a422aa71b54a676234d17f4',
+      title: 'Go To Statement Considered Harmful5',
+      author: 'Trevor',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 3,
+      __v: 0
+    }
+  ]
+
+  test('of five blogs', () => {
+    const result = listHelper.mostBlogsAuthor(blogsWithTwoAuthors)
+
+    const expected = {
+      author:'Edsger W. Dijkstra',
+      blogs:2
+    }
+
+    expect(result).toEqual(expected)
+
+  })
+
+
+  test('of no blogs throws error', () => {
+    expect(() => listHelper.mostBlogsAuthor([])).toThrow('Need blogs array to not be empty')
+  })
+
+})

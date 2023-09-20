@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 // eslint-disable-next-line no-unused-vars
 const dummy = (blogs) => {
   // ...
@@ -28,9 +30,29 @@ const favoriteBlog = (blogs) => {
 
 }
 
+const mostBlogsAuthor = (blogs) => {
+
+  if(blogs.length===0){
+    throw new Error('Need blogs array to not be empty')
+  }
+
+  const authors = _.map(_.uniqBy(blogs, 'author'),(blog) => (blog.author))
+  const blogCounts = _.map(authors,(authorName) => (
+    {
+      author: authorName,
+      blogs:_.filter(blogs,(blog) => {
+        return blog.author === authorName
+      }).length
+    }
+  ))
+  return _.maxBy(blogCounts, (blogCount) => (blogCount.blogs))
+
+}
+
 module.exports = {
   dummy,
   totalLikes,
   mostLikes,
-  favoriteBlog
+  favoriteBlog,
+  mostBlogsAuthor
 }
