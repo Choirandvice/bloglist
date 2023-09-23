@@ -49,10 +49,28 @@ const mostBlogsAuthor = (blogs) => {
 
 }
 
+const mostLikesAuthor = (blogs) => {
+  if(blogs.length===0){
+    throw new Error('Need blogs array to not be empty')
+  }
+
+  const authors = _.map(_.uniqBy(blogs, 'author'),(blog) => (blog.author))
+  const likeCounts = _.map(authors,(authorName) => (
+    {
+      author: authorName,
+      likes: totalLikes(_.filter(blogs,(blog) => {
+        return blog.author === authorName
+      }))
+    }
+  ))
+  return _.maxBy(likeCounts, (likeCount) => likeCount.likes)
+}
+
 module.exports = {
   dummy,
   totalLikes,
   mostLikes,
   favoriteBlog,
-  mostBlogsAuthor
+  mostBlogsAuthor,
+  mostLikesAuthor
 }
