@@ -5,13 +5,13 @@ const info = (...params) => {
 }
 
 const debug = (...params) => {
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== 'test' || process.env.VERBOSITY === 'debug') {
     console.debug(...params)
   }
 }
 
 const error = (...params) => {
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== 'test' || process.env.VERBOSITY === 'debug') {
     console.error(...params)
   }
 }

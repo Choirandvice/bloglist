@@ -6,17 +6,32 @@ const app = require('../app')
 const api = supertest(app)
 const mongoose = require('mongoose')
 mongoose.set('bufferTimeoutMS', 30000)
+const logger = require('../utils/logger')
 
 
-describe('when there is initially one user in db', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
 
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
+beforeEach(async () => {
 
+  await User.deleteMany({})
+
+  logger.debug('__saving_user___')
+
+
+  for (const eachUser of helper.initialUsers){
+    const passwordHash = await bcrypt.hash(eachUser.password, 10)
+    const user = new User({ username:eachUser.username, name:eachUser.name, passwordHash })
     await user.save()
-  })
+
+    logger.debug('__saved_a_user___')
+
+  }
+
+  logger.debug('__saved_users___')
+
+},100000)
+
+
+describe('user creation', () => {
 
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
@@ -155,6 +170,47 @@ describe('when there is initially one user in db', () => {
 
   },100000)
 })
+
+describe('user login', () => {
+
+  test('login succeeds with correct login data', async () => {
+
+    const userLogin = {
+      username: helper.initialUsers[0].username,
+      password: helper.initialUsers[0].password
+    }
+
+    const result = await api
+      .post('/api/login')
+      .send(userLogin)
+      .expect(200)
+
+
+    expect(result.body.token).toBeDefined()
+
+  },100000)
+
+  test('login fails with bad login data', async () => {
+
+
+    const userLogin = {
+      username: helper.initialUsers[0].username,
+      password: 'jhgkjhgkjhg'
+    }
+
+    await api
+      .post('/api/login')
+      .send(userLogin)
+      .expect(401)
+
+
+
+
+  },100000)
+
+
+})
+
 
 afterAll(async () => {
   await mongoose.connection.close()

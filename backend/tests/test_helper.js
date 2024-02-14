@@ -16,6 +16,26 @@ const initialBlogs = [
   }
 ]
 
+const initialUsers = [
+
+  {
+    username: 'root',
+    name: 'Mr John Smith',
+    password: 'password123'
+  },
+  {
+    username: 'fueccoco',
+    name: 'Mr John Fueccoco',
+    password: 'superinsecurepassword'
+  },
+  {
+    username: 'mawile',
+    name: 'Ms Mawile',
+    password: 'anotherinsecurepassword'
+  }
+]
+
+
 // returns all blogs in DB, force wait
 const blogsInDb = async() => {
   const blogs = await Blog.find({})
@@ -29,5 +49,5 @@ const usersInDb = async () => {
 
 
 module.exports = {
-  initialBlogs, blogsInDb, usersInDb
+  initialBlogs, initialUsers, blogsInDb, usersInDb
 }
