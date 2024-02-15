@@ -25,14 +25,69 @@ beforeEach(async () => {
 
   await User.deleteMany({})
 
+  // hash each password and save users
   for (const eachUser of helper.initialUsers){
     const passwordHash = await bcrypt.hash(eachUser.password, 10)
     const user = new User({ username:eachUser.username, name:eachUser.name, passwordHash })
     await user.save()
   }
 
+  const usersInDb = await helper.usersInDbAsUsers()
+
+  logger.debug('_USERSINDB_',usersInDb)
+
+
   await Blog.deleteMany({})
-  await Blog.insertMany(helper.initialBlogs)
+  // await Blog.insertMany(helper.initialBlogs)
+
+  // save each blog in database with relevant user
+  for (const eachBlog of helper.initialBlogs){
+
+    // logger.debug('_EACHBLOG_',eachBlog)
+
+    const userForBlog = eachBlog.userThatCreated
+
+    const thisUser = usersInDb.filter((user) =>
+      user.username === helper.initialUsers[userForBlog].username)
+
+    // logger.debug('_THIS_USER_',thisUser[0])
+
+    const blog = new Blog({
+      title: eachBlog.title,
+      author: eachBlog.author,
+      url: eachBlog.url,
+      likes: eachBlog.likes,
+      user: thisUser[0].id
+    })
+
+    // logger.debug('_BLOG CREATED_',blog)
+
+    const savedBlog = await blog.save()
+
+    // logger.debug('_BLOG SAVED_',savedBlog)
+
+    thisUser[0].blogs = thisUser[0].blogs.concat(savedBlog._id)
+
+    // logger.debug('_USER_UPDATED_',thisUser[0])
+
+    await thisUser[0].save()
+
+    // logger.debug('_USER_SAVED_',savedUser)
+  }
+
+  // const usersInDbResult = await helper.usersInDb()
+  // const blogsInDbResult = await helper.blogsInDb()
+
+  // logger.debug('_FINALUSERS_',usersInDbResult)
+
+  // logger.debug('_FINALBLOGS_',blogsInDbResult)
+
+  // // save blogs into users
+  // for (const eachUser of helper.initialUsers){
+  //   const passwordHash = await bcrypt.hash(eachUser.password, 10)
+  //   const user = new User({ username:eachUser.username, name:eachUser.name, passwordHash })
+  //   await user.save()
+  // }
 
 
   // const blogObjects = helper.initialBlogs
@@ -72,8 +127,6 @@ describe('addition of a new blog', () => {
 
     const token = await getLoginToken()
 
-    logger.debug('__token__',token)
-
     const newBlog = {
       title: 'A new blog for this test',
       author: 'Jane Smith',
@@ -90,6 +143,10 @@ describe('addition of a new blog', () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialBlogs.length+1)
+
+    const usersAtEnd = await helper.usersInDb()
+    const userForThisBlog = (usersAtEnd.filter(user => user.username===helper.initialUsers[0].username))[0]
+    expect(userForThisBlog.blogs).toHaveLength(2)
 
     const titles = response.body.map(r => r.title)
     expect(titles).toContain('A new blog for this test')
@@ -168,6 +225,12 @@ describe('addition of a new blog', () => {
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(helper.initialBlogs.length)
+
+
+    const usersAtEnd = await helper.usersInDb()
+    const userForThisBlog = (usersAtEnd.filter(user => user.username===helper.initialUsers[0].username))[0]
+    expect(userForThisBlog.blogs).toHaveLength(1)
+
 
   },100000)
 

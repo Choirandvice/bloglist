@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "NODE_ENV=test VERBOSITY=test jest --verbose --runInBand",
-    "test_debug": "NODE_ENV=test VERBOSITY=debug jest --verbose --runInBand -t \"login succeeds\"",
+    "test_debug": "NODE_ENV=test VERBOSITY=debug jest --verbose --runInBand -t \"when there is initially some blogs saved\"",
     "lint": "eslint ."
   },
   "author": "Ryan Harrison",
